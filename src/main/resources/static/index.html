@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque Saúde - Prefeitura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .table-container {
+            transition: all 0.3s ease;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .sortable:hover {
+            background-color: #ebf8ff;
+            cursor: pointer;
+        }
+        .sort-icon {
+            transition: transform 0.2s ease;
+        }
+        .sort-asc .sort-icon {
+            transform: rotate(180deg);
+        }
+        .status-low {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        .status-medium {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-high {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        @media (max-width: 1024px) {
+            .tables-container {
+                flex-direction: column;
+            }
+            .table-wrapper {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white py-6 shadow-md">
+        <div class="w-full px-4 flex items-center justify-between flex-wrap md:flex-nowrap">
+    <!-- LOGO -->
+    <div class="w-full md:w-auto flex justify-center md:justify-start mb-4 md:mb-0">
+        <img src="Imagens/logo-fms-horizontal.svg" alt="Logo Saúde" class="h-20 md:h-28">
+    </div>
+
+    <!-- TÍTULO E SUBTÍTULO -->
+    <div class="w-full md:flex-1 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-800">ESTOQUE SAÚDE</h1>
+        <p class="text-blue-600 mt-2">Controle de materiais da Secretaria Municipal de Saúde</p>
+    </div>
+</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Search and Filter Bar -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <input type="text" id="globalSearch" placeholder="Pesquisar em todas as tabelas..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                </div>
+                <select id="filterEstablishment" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Todos estabelecimentos</option>
+                    <option value="Fundação Municipal de Saude">Fundação Municipal de Saúde</option>
+                    <option value="UPA SANT´ANA">U.P.A SANT´ANA</option>
+                    <option value="UPA SANTA PAULA">U.P.A SANTA PAULA</option>
+                    <option value="UPA UVARANAS">U.P.A UVARANAS</option>
+                    <option value="C.A.C -Atendimento infantil">C.A.C - Centro de Atendimento a Criança</option>
+                    <option value="Hospital Municipal Amadeu Puppe">Hospital Municipal Amadeu Puppe</option>
+                    <option value="UBS Abrahao Federmann">UBS Abrahao Federmann</option>
+                    <option value="UBS Adam Polan">UBS Adam Polan</option>
+                    <option value="UBS Adão Ademar Andrade">UBS Adão Ademar Andrade</option>
+                    <option value="UBS Adilson Baggio">UBS Adilson Baggio</option>
+                    <option value="UBS Agostinho Brenner">UBS Agostinho Brenner</option>
+                    <option value="UBS Alfredo Levandovski">UBS Alfredo Levandovski</option>
+                    <option value="UBS Aluizio Grochoski">UBS Aluizio Grochoski</option>
+                    <option value="UBS Ambrosio Bricailo">UBS Ambrosio Bricailo</option>
+                    <option value="UBS Antero Machado de Mello">UBS Antero Machado de Mello</option>
+                    <option value="UBS Antônio Horacio de Miranda">UBS Antônio Horacio de Miranda</option>
+                    <option value="UBS Antônio Russo">UBS Antônio Russo</option>
+                    <option value="UBS Antônio Saliba">UBS Antônio Saliba</option>
+                    <option value="UBS Aurelio Grott">UBS Aurelio Grott</option>
+                    <option value="UBS Carlos dexaunet Neto">UBS Carlos dexaunet Neto</option>
+                    <option value="UBS Carlos Ribeiro de Macedo">UBS Carlos Ribeiro de Macedo</option>
+                    <option value="UBS Cesar Milleo">UBS Cesar Milleo</option>
+                    <option value="UBS Cleon Franscisco de Macedo">UBS Cleon Franscisco de Macedo</option>
+                    <option value="UBS Clyceu Carlos de Macedo">UBS Clyceu Carlos de Macedo</option>
+                    <option value="UBS Crutac">UBS Crutac</option>
+                    <option value="UBS Cyro de Lima Garcia">UBS Cyro de Lima Garcia</option>
+                    <option value="UBS Egon Roskamp">UBS Egon Roskamp</option>
+                    <option value="UBS Eugenio Bocchi">UBS Eugenio Bocchi</option>
+                    <option value="UBS Ezebedeu Linhares">UBS Ezebedeu Linhares</option>
+                    <option value="UBS Felix Vianna">UBS Felix Vianna</option>
+                    <option value="UBS Horacio Droppa">UBS Horacio Droppa</option>
+                    <option value="UBS Jamil Mussi">UBS Jamil Mussi</option>
+                    <option value="UBS Javier Cejas Arzabe">UBS Javier Cejas Arzabe</option>
+                    <option value="UBS Jayme Gusmann">UBS Jayme Gusmann</option>
+                    <option value="UBS João de Oliveira Bello">UBS João de Oliveira Bello</option>
+                    <option value="UBS José Bueno">UBS José Bueno</option>
+                    <option value="UBS José Carlos Araujo">UBS José Carlos Araujo</option>
+                    <option value="UBS Julio de Azevedo">UBS Julio de Azevedo</option>
+                    <option value="UBS Lauro Muller">UBS Lauro Muller</option>
+                    <option value="UBS Louis Charles Buron">UBS Louis Charles Buron</option>
+                    <option value="UBS Luis Conrado Mansani">UBS Luis Conrado Mansani</option>
+                    <option value="UBS Lubomir Urban">UBS Lubomir Urban</option>
+                    <option value="UBS Luiz Fernando Cajado Braga">UBS Luiz Fernando Cajado Braga</option>
+                    <option value="UBS Madre Josefa">UBS Madre Josefa</option>
+                    <option value="UBS Nilton Luis de Castro">UBS Nilton Luis de Castro</option>
+                    <option value="UBS Ottoniel Pimentel Santos">UBS Ottoniel Pimentel Santos</option>
+                    <option value="UBS PANAMÁ - Cesar Antonio Ribas Milleo">UBS PANAMÁ - Cesar Antonio Ribas Milleo</option>
+                    <option value="UBS Paulo Madureira Novaes">UBS Paulo Madureira Novaes</option>
+                    <option value="UBS Roberto Furtenberger">UBS Roberto Furtenberger</option>
+                    <option value="UBS Romulo Pazinato">UBS Romulo Pazinato</option>
+                    <option value="UBS Sady Silveira">UBS Sady Silveira</option>
+                    <option value="UBS Sharise Angelica Arruda">UBS Sharise Angelica Arruda</option>
+                    <option value="UBS Silas Sallen">UBS Silas Sallen</option>
+                    <option value="UBS Zilda Arns">UBS Zilda Arns</option>
+
+                </select>
+                <select id="filterLocation" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Todos locais</option>
+                    <option value="Almoxarifado">Almoxarifado</option>
+                    <option value="Farmácia">Farmácia</option>
+                    
+                </select>
+                <button id="resetFilters" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-redo mr-2"></i>Limpar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tables Container -->
+        <div class="tables-container flex flex-col lg:flex-row gap-6 mb-8 ml-[-8px]">
+
+           <!-- Table 3: Materiais de Saúde -->
+            <div class="table-wrapper flex-1">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+                    <div class="p-4 border-b bg-blue-50">
+                        <h2 class="text-xl font-semibold text-blue-800 flex items-center">
+                            <i class="fas fa-pills mr-2"></i> Materiais de Saúde
+                        </h2>
+                        <div class="text-sm text-gray-600 mt-1">
+                            <span id="lastUpdate3">Última atualização: Carregando...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 border-b">
+                        <div class="relative">
+                            <input type="text" id="searchTable3" placeholder="Pesquisar materiais..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto flex-grow">
+                        <div id="loading3" class="flex justify-center items-center py-8">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <table id="table3" class="min-w-full divide-y divide-gray-200 hidden">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="0">
+                                        <div class="flex items-center">
+                                            Material
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="1">
+                                        <div class="flex items-center">
+                                            Estabelecimento
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="2">
+                                        <div class="flex items-center">
+                                            Local
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="3">
+                                        <div class="flex items-center">
+                                            Quantidade
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="table3Body" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                        <div class="text-sm text-gray-700">
+                            <span id="table3Count">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Table 2: Locais Internos -->
+            <div class="table-wrapper flex-1">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+                    <div class="p-4 border-b bg-blue-50">
+                        <h2 class="text-xl font-semibold text-blue-800 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i> Locais Internos
+                        </h2>
+                        <div class="text-sm text-gray-600 mt-1">
+                            <span id="lastUpdate2">Última atualização: Carregando...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 border-b">
+                        <div class="relative">
+                            <input type="text" id="searchTable2" placeholder="Pesquisar locais..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto flex-grow">
+                        <div id="loading2" class="flex justify-center items-center py-8">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <table id="table2" class="min-w-full divide-y divide-gray-200 hidden">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="0">
+                                        <div class="flex items-center">
+                                            Estabelecimento
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="1">
+                                        <div class="flex items-center">
+                                            Local
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="2">
+                                        <div class="flex items-center">
+                                            Responsável
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">
+                                        Capacidade
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="table2Body" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                        <div class="text-sm text-gray-700">
+                            <span id="table2Count">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <!-- Table 1: Estabelecimentos de Saúde -->
+            <div class="table-wrapper flex-1">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+                    <div class="p-4 border-b bg-blue-50">
+                        <h2 class="text-xl font-semibold text-blue-800 flex items-center">
+                            <i class="fas fa-hospital mr-2"></i> Estabelecimentos
+                        </h2>
+                        <div class="text-sm text-gray-600 mt-1">
+                            <span id="lastUpdate1">Última atualização: Carregando...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 border-b">
+                        <div class="relative">
+                            <input type="text" id="searchTable1" placeholder="Pesquisar estabelecimentos..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto flex-grow">
+                        <div id="loading1" class="flex justify-center items-center py-8">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <table id="table1" class="min-w-full divide-y divide-gray-200 hidden">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="0">
+                                        <div class="flex items-center">
+                                            Estabelecimento
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="1">
+                                        <div class="flex items-center">
+                                            Tipo
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="sortable px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider" data-column="2">
+                                        <div class="flex items-center">
+                                            Bairro
+                                            <i class="fas fa-sort sort-icon ml-2 text-gray-500"></i>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">
+                                        Locais de estoque
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="table1Body" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                        <div class="text-sm text-gray-700">
+                            <span id="table1Count">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        <!-- Info Box -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Informações sobre o estoque de saúde</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <p>Os dados são atualizados automaticamente todos os dias às 15:00. Para solicitações especiais ou relatórios detalhados, entre em contato com a Secretaria Municipal de Saúde.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Legend -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Legenda de Status</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
+                    <span class="text-sm">Crítico (abaixo de 10%)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
+                    <span class="text-sm">Atenção (10-30%)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+                    <span class="text-sm">Normal (acima de 30%)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-semibold">Prefeitura Municipal</h3>
+                    <p class="text-gray-400 text-sm">Secretaria Municipal de Saúde</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                        <i class="fas fa-phone-alt"></i> (XX) XXXX-XXXX
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                        <i class="fas fa-envelope"></i> 
+                    </a>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-700 text-center text-sm text-gray-400">
+                &copy; 2025 Prefeitura Municipal. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data for demonstration
+        // In a real application, this would come from an API
+        const sampleData1 = [
+             ["Hospital Municipal Amadeu Puppe", "Unidade Básica", "Uvaranas", "Farmácia, Almoxarifado"],
+            ["UBS Abrahao Federmann", "Unidade Básica", "Anna Rita", "Farmácia, Almoxarifado"],
+            ["UBS Adam Polan", "Unidade Básica", "Palmerinha", "Farmácia, Almoxarifado"],
+            ["UBS Adão Ademar Andrade", "Unidade Básica", "Cerejeira", "Farmácia, Almoxarifado"],
+            ["UBS Adilson Baggio", "Unidade Básica", "Sto. Antonio", "Farmácia, Almoxarifado"],
+            ["UBS Agostinho Brenner", "Unidade Básica", "Maria Otilia", "Farmácia, Almoxarifado"],
+            ["UBS Alfredo Levandovski", "Unidade Básica", "Gralha Azul", "Farmácia, Almoxarifado"],
+            ["UBS Aluizio Grochoski", "Unidade Básica", "Vila Guaira", "Farmácia, Almoxarifado"],
+            ["UBS Ambrosio Bricailo", "Unidade Básica", "Bomsucesso", "Farmácia, Almoxarifado"],
+            ["UBS Antero Machado de Mello", "Unidade Básica", "Rio Verde", "Farmácia, Almoxarifado"],
+            ["UBS Antônio Horacio de Miranda", "Unidade Básica", "Sta. Monica", "Farmácia, Almoxarifado"],
+            ["UBS Antônio Russo", "Unidade Básica", "Centro", "Farmácia, Almoxarifado"],
+            ["UBS Antônio Saliba", "Unidade Básica", "Parque do Sabiá", "Farmácia, Almoxarifado"],
+            ["UBS Aurelio Grott", "Unidade Básica", "Los Angeles", "Farmácia, Almoxarifado"],
+            ["UBS Carlos dexaunet Neto", "Unidade Básica", "Parque Schangri-lá", "Farmácia, Almoxarifado"],
+            ["UBS Carlos Ribeiro de Macedo", "Unidade Básica", "Parque do Café", "Farmácia, Almoxarifado"],
+            ["UBS Cesar Milleo", "Unidade Básica", "Santana", "Farmácia, Almoxarifado"],
+            ["UBS Cleon Franscisco de Macedo", "Unidade Básica", "Rubini", "Farmácia, Almoxarifado"],
+            ["UBS Clyceu Carlos de Macedo", "Unidade Básica", "Parque do café", "Farmácia, Almoxarifado"],
+            ["UBS Crutac", "Unidade Básica", "Itaiacoca", "Farmácia, Almoxarifado"],
+            ["UBS Cyro de Lima Garcia", "Unidade Básica", "Oficinas", "Farmácia, Almoxarifado"],
+            ["UBS Egon Roskamp", "Unidade Básica", "Sta. Paula", "Farmácia, Almoxarifado"],
+            ["UBS Eugenio Bocchi", "Unidade Básica", "Parque Sta. Lucia", "Farmácia, Almoxarifado"],
+            ["UBS Ezebedeu Linhares", "Unidade Básica", "Jd Amalia", "Farmácia, Almoxarifado"],
+            ["UBS Felix Vianna", "Unidade Básica", "Vila Cristina", "Farmácia, Almoxarifado"],
+            ["UBS Horacio Droppa", "Unidade Básica", "Borsato", "Farmácia, Almoxarifado"],
+            ["UBS Jamil Mussi", "Unidade Básica", "Sabará", "Farmácia, Almoxarifado"],
+            ["UBS Javier Cejas Arzabe", "Unidade Básica", "Vila Real", "Farmácia, Almoxarifado"],
+            ["UBS Jayme Gusmann", "Unidade Básica", "Vila Estrela", "Farmácia, Almoxarifado"],
+            ["UBS João de Oliveira Bello", "Unidade Básica", "Guaragi", "Farmácia, Almoxarifado"],
+            ["UBS José Bueno", "Unidade Básica", "Jacarandá", "Farmácia, Almoxarifado"],
+            ["UBS José Carlos Araujo", "Unidade Básica", "Cará-Cará", "Farmácia, Almoxarifado"],
+            ["UBS Julio de Azevedo", "Unidade Básica", "Vilela", "Farmácia, Almoxarifado"],
+            ["UBS Lauro Muller", "Unidade Básica", "Sta. Maria", "Farmácia, Almoxarifado"],
+            ["UBS Louis Charles Buron", "Unidade Básica", "Periquitos", "Farmácia, Almoxarifado"],
+            ["UBS Lubomir Urban", "Unidade Básica", "31 de Março", "Farmácia, Almoxarifado"],
+            ["UBS Luis Conrado Mansani", "Unidade Básica", "Uvaranas", "Farmácia, Almoxarifado"],
+            ["UBS Luiz Fernando Cajado Braga", "Unidade Básica", "Cristo Rei", "Farmácia, Almoxarifado"],
+            ["UBS Madre Josefa", "Unidade Básica", "Olarias", "Farmácia, Almoxarifado"],
+            ["UBS Nilton Luis de Castro", "Unidade Básica", "Taroba", "Farmácia, Almoxarifado"],
+            ["UBS Ottoniel Pimentel Santos", "Unidade Básica", "Vila Cipa", "Farmácia, Almoxarifado"],
+            ["UBS PANAMÁ - Cesar Antonio Ribas Milleo", "Unidade Básica", "Panamá", "Farmácia, Almoxarifado"],
+            ["UBS Paulo Madureira Novaes", "Unidade Básica", "Parque D. Pedro", "Farmácia, Almoxarifado"],
+            ["UBS Roberto Furtenberger", "Unidade Básica", "Vila Velha", "Farmácia, Almoxarifado"],
+            ["UBS Romulo Pazinato", "Unidade Básica", "Nova Russia", "Farmácia, Almoxarifado"],
+            ["UBS Sady Silveira", "Unidade Básica", "Olarias", "Farmácia, Almoxarifado"],
+            ["UBS Sharise Angelica Arruda", "Unidade Básica", "São Marcos", "Farmácia, Almoxarifado"],
+            ["UBS Silas Sallen", "Unidade Básica", "Vila Claudionara", "Farmácia, Almoxarifado"],
+            ["UBS Zilda Arns", "Unidade Básica", "Nossa Senhora das Graças", "Farmácia, Almoxarifado"]
+
+
+        
+        ];
+
+        const sampleData2 = [
+            ["UBS Luis Conrado", "Farmácia", "Dra. Patolino", "50m²"],
+            ["UBS Adão Ademar Andrade", "Farmácia", "Enf. Juliana Rocha", "42m²"],
+            ["UBS Egon Roskamp", "Farmácia", "Dra. Marina Lopes", "35m²"],
+            ["UBS Javier Cejas Arzabe", "Farmácia", "Dr. Felipe Nunes", "60m²"],
+            ["UBS Madre Josefa", "Farmácia", "Enf. Tatiane Martins", "48m²"],
+            ["UBS Romulo Pazinato", "Farmácia", "Dra. Carla Ribeiro", "53m²"]
+            //["UBS Centro", "Almoxarifado", "Sr. Carlos Mendes", "30m²"],
+            //["UBS Vila Nova", "Farmácia", "Dr. Marcos Oliveira", "45m²"],
+            //["UBS Vila Nova", "Enfermaria", "Enf. Juliana Costa", "60m²"],
+            //["Hospital Municipal", "Farmácia", "Farmac. Roberta Alves", "80m²"],
+            //["Hospital Municipal", "Centro Cirúrgico", "Enf. Ricardo Souza", "120m²"],
+            //["Hospital Municipal", "Almoxarifado", "Sr. José Santos", "50m²"],
+            //["UBS Jardim São Paulo", "Farmácia", "Dra. Patrícia Lima", "40m²"],
+            //["UBS Santa Maria", "Farmácia", "Farmac. Lucas Pereira", "45m²"],
+            //["UBS Santa Maria", "Enfermaria", "Enf. Amanda Rocha", "55m²"],
+            //["UBS Parque das Flores", "Farmácia", "Dra. Fernanda Gomes", "35m²"],
+            //["Hospital Infantil", "Farmácia", "Farmac. Bruno Castro", "60m²"],
+            //["Hospital Infantil", "Enfermaria Pediátrica", "Enf. Carolina Dias", "90m²"],
+            //["UBS Nova Esperança", "Farmácia", "Dra. Vanessa Martins", "40m²"],
+            //["UBS São José", "Farmácia", "Farmac. Diego Almeida", "45m²"],
+            //["UBS São José", "Enfermaria", "Enf. Rafaela Nunes", "50m²"],
+            //["UBS Vila Rica", "Farmácia", "Dra. Camila Ferreira", "40m²"]
+        ];
+
+        const sampleData3 = [
+            ["Paracetamol 500mg", "UBS Luis Conrado", "Farmácia", 150, "Normal"],
+            ["Dipirona Sódica 1g", "UBS Adão Ademar Andrade", "Farmácia", 230, "Normal"],
+            ["Amoxicilina 500mg", "UBS Egon Roskamp", "Farmácia", 75, "Crítico"],
+            ["Ibuprofeno 600mg", "UBS Javier Cejas Arzabe", "Farmácia", 120, "Normal"],
+            ["Omeprazol 20mg", "UBS Madre Josefa", "Farmácia", 45, "Crítico"],
+            ["Soro Fisiológico 0,9%", "UBS Romulo Pazinato", "Farmácia", 310, "Normal"]
+            //["Dipirona 500mg", "UBS Centro", "Farmácia", 120, "Normal"],
+            //["Seringa 3ml", "UBS Centro", "Farmácia", 200, "Normal"],
+            //["Máscara cirúrgica", "UBS Centro", "Almoxarifado", 500, "Normal"],
+            //["Luvas descartáveis", "UBS Centro", "Almoxarifado", 300, "Normal"],
+            //["Ibuprofeno 400mg", "UBS Vila Nova", "Farmácia", 80, "Normal"],
+            //["Soro fisiológico 0,9%", "UBS Vila Nova", "Enfermaria", 50, "Atenção"],
+            //["Gaze estéril", "UBS Vila Nova", "Enfermaria", 120, "Normal"],
+            //["Álcool em gel", "UBS Vila Nova", "Enfermaria", 25, "Crítico"],
+            //["Omeprazol 20mg", "Hospital Municipal", "Farmácia", 180, "Normal"],
+            //["Seringa 10ml", "Hospital Municipal", "Farmácia", 150, "Normal"],
+            //["Agulha 25x7", "Hospital Municipal", "Farmácia", 200, "Normal"],
+            //["Sutura cirúrgica", "Hospital Municipal", "Centro Cirúrgico", 80, "Normal"],
+            //["Luvas cirúrgicas", "Hospital Municipal", "Centro Cirúrgico", 120, "Normal"],
+            //["Anestésico local", "Hospital Municipal", "Centro Cirúrgico", 45, "Atenção"],
+            //["Atadura crepe", "Hospital Municipal", "Almoxarifado", 90, "Normal"],
+            //["Termômetro digital", "Hospital Municipal", "Almoxarifado", 15, "Crítico"],
+            //["Amoxicilina 500mg", "UBS Jardim São Paulo", "Farmácia", 100, "Normal"],
+            //["Band-aid", "UBS Jardim São Paulo", "Farmácia", 200, "Normal"],
+            //["Ácido acetilsalicílico", "UBS Santa Maria", "Farmácia", 75, "Normal"],
+            //["Soro fisiológico 0,9%", "UBS Santa Maria", "Enfermaria", 30, "Atenção"],
+            //["Cateter IV", "UBS Santa Maria", "Enfermaria", 40, "Normal"],
+            //["Hidroclorotiazida 25mg", "UBS Parque das Flores", "Farmácia", 60, "Normal"],
+            //["Máscara N95", "UBS Parque das Flores", "Farmácia", 20, "Crítico"],
+            //["Seringa 5ml", "Hospital Infantil", "Farmácia", 180, "Normal"],
+            //["Paracetamol gotas", "Hospital Infantil", "Farmácia", 90, "Normal"],
+            //["Leite materno", "Hospital Infantil", "Enfermaria Pediátrica", 50, "Normal"],
+            //["Fralda infantil", "Hospital Infantil", "Enfermaria Pediátrica", 120, "Normal"],
+            //["Losartana 50mg", "UBS Nova Esperança", "Farmácia", 80, "Normal"],
+            //["Soro glicosado", "UBS São José", "Farmácia", 40, "Atenção"],
+            //["Glicose 25%", "UBS São José", "Enfermaria", 25, "Crítico"],
+            //["Insulina", "UBS Vila Rica", "Farmácia", 35, "Atenção"]
+        ];
+
+        // Function to simulate API call with delay
+        function fetchData(tableId, data) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Update last update time
+                    const now = new Date();
+                    document.getElementById(`lastUpdate${tableId}`).textContent = 
+                        `Última atualização: ${now.toLocaleDateString()} às ${now.toLocaleTimeString()}`;
+                    
+                    resolve(data);
+                }, 800); // Simulate network delay
+            });
+        }
+
+        // Table management class
+        class TableManager {
+            constructor(tableId, data) {
+                this.tableId = tableId;
+                this.originalData = data;
+                this.filteredData = [...data];
+                this.currentPage = 1;
+                this.rowsPerPage = 10;
+                this.sortColumn = null;
+                this.sortDirection = 'asc';
+                this.searchTerm = '';
+                
+                this.init();
+            }
+            
+            init() {
+                // Set up event listeners
+                document.getElementById(`searchTable${this.tableId}`).addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value.toLowerCase();
+                    this.currentPage = 1;
+                    this.filterData();
+                    this.renderTable();
+                });
+                
+                // Sortable columns
+                document.querySelectorAll(`#table${this.tableId} .sortable`).forEach(th => {
+                    th.addEventListener('click', () => {
+                        const column = parseInt(th.getAttribute('data-column'));
+                        
+                        if (this.sortColumn === column) {
+                            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+                        } else {
+                            this.sortColumn = column;
+                            this.sortDirection = 'asc';
+                        }
+                        
+                        // Update sort indicators
+                        document.querySelectorAll(`#table${this.tableId} .sortable`).forEach(el => {
+                            el.classList.remove('sort-asc', 'sort-desc');
+                        });
+                        
+                        th.classList.add(this.sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                        
+                        this.sortData();
+                        this.renderTable();
+                    });
+                });
+                
+                // Initial render
+                this.filterData();
+                this.renderTable();
+            }
+            
+            filterData() {
+                if (this.searchTerm === '') {
+                    this.filteredData = [...this.originalData];
+                } else {
+                    this.filteredData = this.originalData.filter(row => 
+                        row.some(cell => cell.toString().toLowerCase().includes(this.searchTerm))
+                    );
+                }
+                
+                // Apply additional filters from dropdowns
+                const establishmentFilter = document.getElementById('filterEstablishment').value;
+                const locationFilter = document.getElementById('filterLocation').value;
+                
+                if (establishmentFilter || locationFilter) {
+                    this.filteredData = this.filteredData.filter(row => {
+                        // Check if row has establishment column (all tables have it in different positions)
+                        const establishmentCol = this.tableId === '1' ? 0 : (this.tableId === '2' ? 0 : 1);
+                        const locationCol = this.tableId === '2' ? 1 : (this.tableId === '3' ? 2 : null);
+                        
+                        const establishmentMatch = !establishmentFilter || 
+                            row[establishmentCol].toString().includes(establishmentFilter);
+                        
+                        const locationMatch = !locationFilter || 
+                            (locationCol !== null && row[locationCol].toString().includes(locationFilter));
+                        
+                        return establishmentMatch && locationMatch;
+                    });
+                }
+                
+                // Apply sorting if needed
+                if (this.sortColumn !== null) {
+                    this.sortData();
+                }
+                
+                // Update count display
+                document.getElementById(`table${this.tableId}Count`).textContent = 
+                    `${this.filteredData.length} itens encontrados`;
+            }
+            
+            sortData() {
+                this.filteredData.sort((a, b) => {
+                    const valA = a[this.sortColumn];
+                    const valB = b[this.sortColumn];
+                    
+                    // Numeric comparison
+                    if (!isNaN(valA) && !isNaN(valB)) {
+                        return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+                    }
+                    
+                    // String comparison
+                    const strA = valA.toString().toLowerCase();
+                    const strB = valB.toString().toLowerCase();
+                    
+                    if (strA < strB) return this.sortDirection === 'asc' ? -1 : 1;
+                    if (strA > strB) return this.sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            
+            renderTable() {
+                const startIndex = (this.currentPage - 1) * this.rowsPerPage;
+                const endIndex = startIndex + this.rowsPerPage;
+                const paginatedData = this.filteredData.slice(startIndex, endIndex);
+                
+                // Update table body
+                const tbody = document.getElementById(`table${this.tableId}Body`);
+                tbody.innerHTML = '';
+                
+                paginatedData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    row.forEach((cell, index) => {
+                        const td = document.createElement('td');
+                        td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-800';
+                        
+                        // Special formatting for certain columns
+                        if (this.tableId === '3' && index === 4) {
+                            // Status column in table 3
+                            const status = cell.toLowerCase();
+                            let statusClass = 'status-medium';
+                            
+                            if (status.includes('crítico')) statusClass = 'status-low';
+                            if (status.includes('normal')) statusClass = 'status-high';
+                            
+                            td.innerHTML = `<span class="px-2 py-1 rounded-full ${statusClass} text-xs font-medium">${cell}</span>`;
+                        } else if ((this.tableId === '3' && index === 3) || (this.tableId === '2' && index === 3)) {
+                            // Quantity and capacity columns
+                            td.className += ' font-medium';
+                            td.textContent = cell;
+                        } else {
+                            td.textContent = cell;
+                        }
+                        
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                
+                // Show table (hide loading)
+                document.getElementById(`loading${this.tableId}`).classList.add('hidden');
+                document.getElementById(`table${this.tableId}`).classList.remove('hidden');
+            }
+        }
+
+        // Global search functionality
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            [tableManager1, tableManager2, tableManager3].forEach(manager => {
+                manager.searchTerm = searchTerm;
+                manager.currentPage = 1;
+                manager.filterData();
+                manager.renderTable();
+            });
+        });
+
+        // Filter functionality
+        document.getElementById('filterEstablishment').addEventListener('change', () => {
+            [tableManager1, tableManager2, tableManager3].forEach(manager => {
+                manager.currentPage = 1;
+                manager.filterData();
+                manager.renderTable();
+            });
+        });
+
+        document.getElementById('filterLocation').addEventListener('change', () => {
+            [tableManager1, tableManager2, tableManager3].forEach(manager => {
+                manager.currentPage = 1;
+                manager.filterData();
+                manager.renderTable();
+            });
+        });
+
+        // Reset filters
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            document.getElementById('filterEstablishment').value = '';
+            document.getElementById('filterLocation').value = '';
+            document.getElementById('globalSearch').value = '';
+            
+            [tableManager1, tableManager2, tableManager3].forEach(manager => {
+                manager.searchTerm = '';
+                manager.currentPage = 1;
+                manager.filterData();
+                manager.renderTable();
+            });
+        });
+
+        // Initialize tables when data is loaded
+        let tableManager1, tableManager2, tableManager3;
+
+        // Load data for table 1
+        fetchData(1, sampleData1).then(data => {
+            tableManager1 = new TableManager(1, data);
+        });
+
+        // Load data for table 2
+        fetchData(2, sampleData2).then(data => {
+            tableManager2 = new TableManager(2, data);
+        });
+
+        // Load data for table 3
+        fetchData(3, sampleData3).then(data => {
+            tableManager3 = new TableManager(3, data);
+        });
+    </script>
+</body>
+</html>
